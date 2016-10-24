@@ -100,13 +100,13 @@ class LogoView: NSView {
         NSAnimationContext.current().duration = 0.15
         NSAnimationContext.current().timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
         NSAnimationContext.current().completionHandler = {
+            self.sound.play()
             self.animationState = .Raising
             NSAnimationContext.beginGrouping()
             NSAnimationContext.current().duration = 0.15
             NSAnimationContext.current().timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
             NSAnimationContext.current().completionHandler = {
                 self.animationState = .None
-                self.sound?.play()
             }
             self.animator().raiseProgress = 0
             NSAnimationContext.endGrouping()
