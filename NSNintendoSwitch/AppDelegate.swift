@@ -33,6 +33,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var view: LogoView!
     @IBOutlet weak var menuThemeMarketing: NSMenuItem!
     @IBOutlet weak var menuThemeHardware: NSMenuItem!
+    @IBOutlet weak var menuitemLoop: NSMenuItem!
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return true
@@ -55,10 +56,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func startAnimation(sender: AnyObject) {
         view.animate()
     }
+    
+    @IBAction func loopAnimation(sender: AnyObject) {
+        if menuitemLoop.state == NSOffState {
+            view.loop = true
+            menuitemLoop.state = NSOnState
+        } else {
+            view.loop = false
+            menuitemLoop.state = NSOffState
+        }
+    }
 
 }
 
-class LogoView: NSView {
+class LogoView: NSView, NSSoundDelegate {
 
     enum Theme {
         case Marketing
@@ -91,9 +102,14 @@ class LogoView: NSView {
         }
     }
     
-    let sound = NSSound(named: "switchClick.notification")
+    let sound = NSSound(named: "switchClick.notification")!
+    
+    var loop = false
     
     func animate() {
+        if sound.delegate == nil {
+            sound.delegate = self
+        }
         dropProgress = 0
         raiseProgress = 1
         NSAnimationContext.beginGrouping()
@@ -123,6 +139,12 @@ class LogoView: NSView {
         return super.animation(forKey: key)
     }
     
+    func sound(_ sound: NSSound, didFinishPlaying flag: Bool) {
+        if (flag && loop) {
+            animate()
+        }
+    }
+
     override func draw(_ dirtyRect: NSRect) {
         
         let bounds = self.bounds

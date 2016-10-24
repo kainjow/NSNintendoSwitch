@@ -16,6 +16,7 @@
             <connections>
                 <outlet property="menuThemeHardware" destination="DiC-Z7-6uF" id="VKe-Pv-aad"/>
                 <outlet property="menuThemeMarketing" destination="Q45-2z-ue9" id="xzm-U1-Aq0"/>
+                <outlet property="menuitemLoop" destination="7HR-fm-JmM" id="JVW-8d-Dq7"/>
                 <outlet property="view" destination="VvA-Nj-L92" id="X9P-Or-7IR"/>
             </connections>
         </customObject>
@@ -149,6 +150,11 @@
                             <menuItem title="Run" keyEquivalent="r" id="xst-70-acU">
                                 <connections>
                                     <action selector="startAnimationWithSender:" target="Voe-Tx-rLC" id="pGn-5a-Bug"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Loop" keyEquivalent="l" id="7HR-fm-JmM">
+                                <connections>
+                                    <action selector="loopAnimationWithSender:" target="Voe-Tx-rLC" id="OAv-Ae-4JG"/>
                                 </connections>
                             </menuItem>
                         </items>
