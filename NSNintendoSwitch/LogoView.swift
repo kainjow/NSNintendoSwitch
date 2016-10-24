@@ -64,7 +64,14 @@ class LogoView: NSView, NSSoundDelegate {
     
     var loop = false
     
+    func isAnimating() -> Bool {
+        return animationState != .None || sound.isPlaying
+    }
+    
     func animate() {
+        if isAnimating() {
+            return
+        }
         if sound.delegate == nil {
             sound.delegate = self
         }
