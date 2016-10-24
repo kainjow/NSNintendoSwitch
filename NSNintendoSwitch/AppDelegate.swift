@@ -167,8 +167,9 @@ class LogoView: NSView {
             leftY = baseY - leftLineWidthHalf
             rightY = rightStartY - ((rightStartY - baseY) * dropProgress)
         } else {
-            leftY = baseY - leftLineWidthHalf - (leftLineWidth * raiseProgress)
-            rightY = baseY - (leftLineWidth * raiseProgress)
+            let offset = leftLineWidth * raiseProgress
+            leftY = baseY - leftLineWidthHalf - offset
+            rightY = baseY - offset
         }
         
         // Define path for left controller
