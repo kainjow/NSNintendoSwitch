@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A51141AB1DBD3434004C6659 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51141AA1DBD3434004C6659 /* AppDelegate.swift */; };
 		A51141B01DBD3435004C6659 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A51141AE1DBD3435004C6659 /* MainMenu.xib */; };
+		A51141BA1DBDA392004C6659 /* switchClick.notification.wav in Resources */ = {isa = PBXBuildFile; fileRef = A51141B91DBDA392004C6659 /* switchClick.notification.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -16,6 +17,7 @@
 		A51141AA1DBD3434004C6659 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A51141AF1DBD3435004C6659 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		A51141B11DBD3435004C6659 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A51141B91DBDA392004C6659 /* switchClick.notification.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = switchClick.notification.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +53,7 @@
 				A51141AA1DBD3434004C6659 /* AppDelegate.swift */,
 				A51141AE1DBD3435004C6659 /* MainMenu.xib */,
 				A51141B11DBD3435004C6659 /* Info.plist */,
+				A51141B91DBDA392004C6659 /* switchClick.notification.wav */,
 			);
 			path = NSNintendoSwitch;
 			sourceTree = "<group>";
@@ -115,6 +118,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A51141B01DBD3435004C6659 /* MainMenu.xib in Resources */,
+				A51141BA1DBDA392004C6659 /* switchClick.notification.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
