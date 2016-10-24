@@ -83,6 +83,7 @@ class LogoView: NSView {
         dropProgress = 0
         NSAnimationContext.beginGrouping()
         NSAnimationContext.current().duration = 0.1
+        NSAnimationContext.current().timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
         NSAnimationContext.current().completionHandler = {
             self.sound?.play()
         }
@@ -178,7 +179,7 @@ class LogoView: NSView {
         // Define path for left knob
         let leftKnob = NSBezierPath(ovalIn: NSRect(
             x: leftX + ((leftTrueWidth - knob) / 2),
-            y: baseY - (leftKnobY + knob),
+            y: leftY - (leftKnobY + knob),
             width: knob,
             height: knob
         ))
