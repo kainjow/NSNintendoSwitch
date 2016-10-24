@@ -77,15 +77,24 @@ class LogoView: NSView {
         }
     }
     
+    let sound = NSSound(named: "switchClick.notification")
+    
     func animate() {
         dropProgress = 0
         NSAnimationContext.beginGrouping()
-        NSAnimationContext.current().duration = 0.5
-        animator().dropProgress = 1
+        NSAnimationContext.current().duration = 0.1
         NSAnimationContext.current().completionHandler = {
-            NSSound(named: "switchClick.notification")?.play()
+            self.sound?.play()
         }
+        animator().dropProgress = 1
         NSAnimationContext.endGrouping()
+    }
+    
+    override func animation(forKey key: String) -> Any? {
+        if (key == "dropProgress") {
+            return CABasicAnimation()
+        }
+        return super.animation(forKey: key)
     }
     
     override func draw(_ dirtyRect: NSRect) {
