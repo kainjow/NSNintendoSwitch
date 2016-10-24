@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  NintendoSwitch
+//  NSNintendoSwitch
 //
 //  Created by Kevin Wojniak on 10/23/16.
 //
@@ -51,6 +51,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     }
+    
+    @IBAction func startAnimation(sender: AnyObject) {
+        view.animate()
+    }
 
 }
 
@@ -65,6 +69,23 @@ class LogoView: NSView {
         didSet {
             needsDisplay = true
         }
+    }
+    
+    dynamic var dropProgress: CGFloat = 0 {
+        didSet {
+            needsDisplay = true
+        }
+    }
+    
+    func animate() {
+        dropProgress = 0
+        NSAnimationContext.beginGrouping()
+        NSAnimationContext.current().duration = 0.5
+        animator().dropProgress = 1
+        NSAnimationContext.current().completionHandler = {
+            NSSound(named: "switchClick.notification")?.play()
+        }
+        NSAnimationContext.endGrouping()
     }
     
     override func draw(_ dirtyRect: NSRect) {
@@ -85,19 +106,17 @@ class LogoView: NSView {
             break
         }
         
-        let defaultSize: CGFloat = 200
-        let minSize = min(bounds.size.width, bounds.size.height)
-        let height: CGFloat = minSize > defaultSize ? defaultSize : minSize
-        let width: CGFloat = height // = leftWidth + spacing + rightWidth
-        let leftWidth: CGFloat = height * 0.48
-        let rightWidth: CGFloat = height * 0.42
-        let radius: CGFloat = leftWidth / 2
-        let spacing: CGFloat = height / 10
-        let knob: CGFloat = height / 5
-        let leftKnobY: CGFloat = height * 0.20
-        let rightKnobY: CGFloat = height * 0.44
-        let leftLineWidth: CGFloat = height / 12.5
-        let leftLineWidthHalf: CGFloat = leftLineWidth / 2
+        let height: CGFloat = 200
+        let width = height // = leftWidth + spacing + rightWidth
+        let leftWidth = height * 0.48
+        let rightWidth = height * 0.42
+        let radius = leftWidth / 2
+        let spacing = height / 10
+        let knob = height / 5
+        let leftKnobY = height * 0.20
+        let rightKnobY = height * 0.44
+        let leftLineWidth = height / 12.5
+        let leftLineWidthHalf = leftLineWidth / 2
         
         let baseX = bounds.origin.x + ceil((bounds.size.width - width) / 2)
         let baseY = NSMaxY(bounds) - ceil((bounds.size.height - height) / 2)
@@ -106,6 +125,8 @@ class LogoView: NSView {
         let leftY = baseY - leftLineWidthHalf
         let leftTrueWidth = leftWidth - leftLineWidth
         let rightX = leftX + leftTrueWidth + leftLineWidthHalf + spacing
+        let rightStartY = baseY + (rightKnobY + (knob / 2))
+        let rightY = rightStartY - ((rightStartY - baseY) * dropProgress)
         
         // Define path for left controller
         let left = NSBezierPath()
@@ -129,20 +150,20 @@ class LogoView: NSView {
         
         // Define path for right controller
         let right = NSBezierPath()
-        right.move(to: NSPoint(x: rightX, y: baseY - height))
-        right.line(to: NSPoint(x: (rightX + rightWidth) - radius, y: baseY - height))
+        right.move(to: NSPoint(x: rightX, y: rightY - height))
+        right.line(to: NSPoint(x: (rightX + rightWidth) - radius, y: rightY - height))
         right.appendArc(
-            from: NSPoint(x: rightX + rightWidth, y: baseY - height),
-            to: NSPoint(x: rightX + rightWidth, y: (baseY - height) + radius),
+            from: NSPoint(x: rightX + rightWidth, y: rightY - height),
+            to: NSPoint(x: rightX + rightWidth, y: (rightY - height) + radius),
             radius: radius
         )
-        right.line(to: NSPoint(x: rightX + rightWidth, y: baseY - radius))
+        right.line(to: NSPoint(x: rightX + rightWidth, y: rightY - radius))
         right.appendArc(
-            from: NSPoint(x: rightX + rightWidth, y: baseY),
-            to: NSPoint(x: (rightX + rightWidth) - radius, y: baseY),
+            from: NSPoint(x: rightX + rightWidth, y: rightY),
+            to: NSPoint(x: (rightX + rightWidth) - radius, y: rightY),
             radius: radius
         )
-        right.line(to: NSPoint(x: rightX, y: baseY))
+        right.line(to: NSPoint(x: rightX, y: rightY))
         right.close()
         
         // Define path for left knob
@@ -156,7 +177,7 @@ class LogoView: NSView {
         // Define path for right knob
         let rightKnob = NSBezierPath(ovalIn: NSRect(
             x: rightX + ((rightWidth - knob) / 2),
-            y: baseY - (rightKnobY + knob),
+            y: rightY - (rightKnobY + knob),
             width: knob,
             height: knob
         ))
