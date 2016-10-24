@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  NintendoSwitch
+//  NSNintendoSwitch
 //
 //  Created by Kevin Wojniak on 10/23/16.
 //
@@ -33,6 +33,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var view: LogoView!
     @IBOutlet weak var menuThemeMarketing: NSMenuItem!
     @IBOutlet weak var menuThemeHardware: NSMenuItem!
+    @IBOutlet weak var menuitemLoop: NSMenuItem!
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return true
@@ -51,10 +52,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     }
+    
+    @IBAction func startAnimation(sender: AnyObject) {
+        view.animate()
+    }
+    
+    @IBAction func loopAnimation(sender: AnyObject) {
+        if menuitemLoop.state == NSOffState {
+            view.loop = true
+            menuitemLoop.state = NSOnState
+        } else {
+            view.loop = false
+            menuitemLoop.state = NSOffState
+        }
+    }
 
 }
 
-class LogoView: NSView {
+class LogoView: NSView, NSSoundDelegate {
 
     enum Theme {
         case Marketing
@@ -67,6 +82,69 @@ class LogoView: NSView {
         }
     }
     
+    enum AnimationState {
+        case None
+        case Dropping
+        case Raising
+    }
+    
+    var animationState: AnimationState = .None
+    
+    dynamic var dropProgress: CGFloat = 0 {
+        didSet {
+            needsDisplay = true
+        }
+    }
+    
+    dynamic var raiseProgress: CGFloat = 0 {
+        didSet {
+            needsDisplay = true
+        }
+    }
+    
+    let sound = NSSound(named: "switchClick.notification")!
+    
+    var loop = false
+    
+    func animate() {
+        if sound.delegate == nil {
+            sound.delegate = self
+        }
+        dropProgress = 0
+        raiseProgress = 1
+        NSAnimationContext.beginGrouping()
+        NSAnimationContext.current().duration = 0.15
+        NSAnimationContext.current().timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+        NSAnimationContext.current().completionHandler = {
+            self.sound.play()
+            self.animationState = .Raising
+            NSAnimationContext.beginGrouping()
+            NSAnimationContext.current().duration = 0.3
+            NSAnimationContext.current().timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+            NSAnimationContext.current().completionHandler = {
+                self.animationState = .None
+            }
+            self.animator().raiseProgress = 0
+            NSAnimationContext.endGrouping()
+        }
+        animationState = .Dropping
+        animator().dropProgress = 1
+        NSAnimationContext.endGrouping()
+    }
+    
+    override func animation(forKey key: String) -> Any? {
+        if (key == "dropProgress" || key == "raiseProgress") {
+            return CABasicAnimation()
+        }
+        return super.animation(forKey: key)
+    }
+    
+    func sound(_ sound: NSSound, didFinishPlaying flag: Bool) {
+        if (flag && loop) {
+            animate()
+        }
+    }
+
     override func draw(_ dirtyRect: NSRect) {
         
         let bounds = self.bounds
@@ -85,27 +163,36 @@ class LogoView: NSView {
             break
         }
         
-        let defaultSize: CGFloat = 200
-        let minSize = min(bounds.size.width, bounds.size.height)
-        let height: CGFloat = minSize > defaultSize ? defaultSize : minSize
-        let width: CGFloat = height // = leftWidth + spacing + rightWidth
-        let leftWidth: CGFloat = height * 0.48
-        let rightWidth: CGFloat = height * 0.42
-        let radius: CGFloat = leftWidth / 2
-        let spacing: CGFloat = height / 10
-        let knob: CGFloat = height / 5
-        let leftKnobY: CGFloat = height * 0.20
-        let rightKnobY: CGFloat = height * 0.44
-        let leftLineWidth: CGFloat = height / 12.5
-        let leftLineWidthHalf: CGFloat = leftLineWidth / 2
+        let height: CGFloat = 200
+        let width = height // = leftWidth + spacing + rightWidth
+        let leftWidth = height * 0.48
+        let rightWidth = height * 0.42
+        let radius = leftWidth / 2
+        let spacing = height / 10
+        let knob = height / 5
+        let leftKnobY = height * 0.20
+        let rightKnobY = height * 0.44
+        let leftLineWidth = height / 12.5
+        let leftLineWidthHalf = leftLineWidth / 2
         
         let baseX = bounds.origin.x + ceil((bounds.size.width - width) / 2)
         let baseY = NSMaxY(bounds) - ceil((bounds.size.height - height) / 2)
         let leftHeight = height - leftLineWidth
         let leftX = baseX + leftLineWidthHalf
-        let leftY = baseY - leftLineWidthHalf
         let leftTrueWidth = leftWidth - leftLineWidth
         let rightX = leftX + leftTrueWidth + leftLineWidthHalf + spacing
+        let rightStartY = baseY + (rightKnobY + (knob / 2))
+        let leftY: CGFloat
+        let rightY: CGFloat
+        
+        if animationState == .None || animationState == .Dropping {
+            leftY = baseY - leftLineWidthHalf
+            rightY = rightStartY - ((rightStartY - baseY) * dropProgress)
+        } else {
+            let offset = leftLineWidth * raiseProgress
+            leftY = baseY - leftLineWidthHalf - offset
+            rightY = baseY - offset
+        }
         
         // Define path for left controller
         let left = NSBezierPath()
@@ -129,26 +216,26 @@ class LogoView: NSView {
         
         // Define path for right controller
         let right = NSBezierPath()
-        right.move(to: NSPoint(x: rightX, y: baseY - height))
-        right.line(to: NSPoint(x: (rightX + rightWidth) - radius, y: baseY - height))
+        right.move(to: NSPoint(x: rightX, y: rightY - height))
+        right.line(to: NSPoint(x: (rightX + rightWidth) - radius, y: rightY - height))
         right.appendArc(
-            from: NSPoint(x: rightX + rightWidth, y: baseY - height),
-            to: NSPoint(x: rightX + rightWidth, y: (baseY - height) + radius),
+            from: NSPoint(x: rightX + rightWidth, y: rightY - height),
+            to: NSPoint(x: rightX + rightWidth, y: (rightY - height) + radius),
             radius: radius
         )
-        right.line(to: NSPoint(x: rightX + rightWidth, y: baseY - radius))
+        right.line(to: NSPoint(x: rightX + rightWidth, y: rightY - radius))
         right.appendArc(
-            from: NSPoint(x: rightX + rightWidth, y: baseY),
-            to: NSPoint(x: (rightX + rightWidth) - radius, y: baseY),
+            from: NSPoint(x: rightX + rightWidth, y: rightY),
+            to: NSPoint(x: (rightX + rightWidth) - radius, y: rightY),
             radius: radius
         )
-        right.line(to: NSPoint(x: rightX, y: baseY))
+        right.line(to: NSPoint(x: rightX, y: rightY))
         right.close()
         
         // Define path for left knob
         let leftKnob = NSBezierPath(ovalIn: NSRect(
             x: leftX + ((leftTrueWidth - knob) / 2),
-            y: baseY - (leftKnobY + knob),
+            y: leftY - (leftKnobY + knob),
             width: knob,
             height: knob
         ))
@@ -156,7 +243,7 @@ class LogoView: NSView {
         // Define path for right knob
         let rightKnob = NSBezierPath(ovalIn: NSRect(
             x: rightX + ((rightWidth - knob) / 2),
-            y: baseY - (rightKnobY + knob),
+            y: rightY - (rightKnobY + knob),
             width: knob,
             height: knob
         ))

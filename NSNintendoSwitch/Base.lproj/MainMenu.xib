@@ -16,6 +16,7 @@
             <connections>
                 <outlet property="menuThemeHardware" destination="DiC-Z7-6uF" id="VKe-Pv-aad"/>
                 <outlet property="menuThemeMarketing" destination="Q45-2z-ue9" id="xzm-U1-Aq0"/>
+                <outlet property="menuitemLoop" destination="7HR-fm-JmM" id="JVW-8d-Dq7"/>
                 <outlet property="view" destination="VvA-Nj-L92" id="X9P-Or-7IR"/>
             </connections>
         </customObject>
@@ -142,6 +143,23 @@
                         </items>
                     </menu>
                 </menuItem>
+                <menuItem title="Animation" id="cZU-T3-rjZ">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Animation" id="0VH-f4-Ixt">
+                        <items>
+                            <menuItem title="Run" keyEquivalent="r" id="xst-70-acU">
+                                <connections>
+                                    <action selector="startAnimationWithSender:" target="Voe-Tx-rLC" id="pGn-5a-Bug"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Loop" keyEquivalent="l" id="7HR-fm-JmM">
+                                <connections>
+                                    <action selector="loopAnimationWithSender:" target="Voe-Tx-rLC" id="OAv-Ae-4JG"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
                 <menuItem title="Window" id="aUF-d1-5bR">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
@@ -181,17 +199,17 @@
                 </menuItem>
             </items>
         </menu>
-        <window title="NSNintendoSwitch" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+        <window title="NSNintendoSwitch" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="MainWindow" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="480" height="360"/>
+            <rect key="contentRect" x="335" y="390" width="300" height="450"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="480" height="360"/>
+                <rect key="frame" x="0.0" y="0.0" width="300" height="450"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="VvA-Nj-L92" customClass="LogoView" customModule="NSNintendoSwitch" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="480" height="360"/>
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="450"/>
                     </customView>
                 </subviews>
                 <constraints>
