@@ -71,7 +71,21 @@ class LogoView: NSView {
         }
     }
     
+    enum AnimationState {
+        case None
+        case Dropping
+        case Raising
+    }
+    
+    var animationState: AnimationState = .None
+    
     dynamic var dropProgress: CGFloat = 0 {
+        didSet {
+            needsDisplay = true
+        }
+    }
+    
+    dynamic var raiseProgress: CGFloat = 0 {
         didSet {
             needsDisplay = true
         }
@@ -81,18 +95,29 @@ class LogoView: NSView {
     
     func animate() {
         dropProgress = 0
+        raiseProgress = 1
         NSAnimationContext.beginGrouping()
-        NSAnimationContext.current().duration = 0.1
+        NSAnimationContext.current().duration = 0.15
         NSAnimationContext.current().timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
         NSAnimationContext.current().completionHandler = {
-            self.sound?.play()
+            self.animationState = .Raising
+            NSAnimationContext.beginGrouping()
+            NSAnimationContext.current().duration = 0.15
+            NSAnimationContext.current().timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+            NSAnimationContext.current().completionHandler = {
+                self.animationState = .None
+                self.sound?.play()
+            }
+            self.animator().raiseProgress = 0
+            NSAnimationContext.endGrouping()
         }
+        animationState = .Dropping
         animator().dropProgress = 1
         NSAnimationContext.endGrouping()
     }
     
     override func animation(forKey key: String) -> Any? {
-        if (key == "dropProgress") {
+        if (key == "dropProgress" || key == "raiseProgress") {
             return CABasicAnimation()
         }
         return super.animation(forKey: key)
@@ -132,11 +157,19 @@ class LogoView: NSView {
         let baseY = NSMaxY(bounds) - ceil((bounds.size.height - height) / 2)
         let leftHeight = height - leftLineWidth
         let leftX = baseX + leftLineWidthHalf
-        let leftY = baseY - leftLineWidthHalf
         let leftTrueWidth = leftWidth - leftLineWidth
         let rightX = leftX + leftTrueWidth + leftLineWidthHalf + spacing
         let rightStartY = baseY + (rightKnobY + (knob / 2))
-        let rightY = rightStartY - ((rightStartY - baseY) * dropProgress)
+        let leftY: CGFloat
+        let rightY: CGFloat
+        
+        if animationState == .None || animationState == .Dropping {
+            leftY = baseY - leftLineWidthHalf
+            rightY = rightStartY - ((rightStartY - baseY) * dropProgress)
+        } else {
+            leftY = baseY - leftLineWidthHalf - (leftLineWidth * raiseProgress)
+            rightY = baseY - (leftLineWidth * raiseProgress)
+        }
         
         // Define path for left controller
         let left = NSBezierPath()
